@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>City Explorer Sign In</title>
+  <style>
+      :root{
+        --header-h: 56px;
+        --footer-h: 48px;
+        --gap: 12px;
+      }
+
+      *{box-sizing:border-box}
+
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background-image: url("5caca19b4d0c0.avif");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+      }
+
+      header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: var(--header-h);
+        background-color: rgb(47, 200, 247);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 16px;
+        gap: var(--gap);
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        z-index: 120;
+      }
+      header h1 {
+        font-style: italic;
+        font-size: 3em;
+        margin: 0;
+        line-height: 1;
+      }
+
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: -250px;
+        width: 250px;
+        height: 100%;
+        background-color: #fff;
+        box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+        transition: left 0.3s ease;
+        padding: calc(var(--header-h) + 16px) 20px 20px;
+        z-index: 100;
+        display: flex;
+        flex-direction: column;
+      }
+      .sidebar.open { left: 0; }
+
+      .sidebar h2 { margin-top: 0; margin-bottom: 12px; font-size: 1.1rem; }
+      .sidebar ul { list-style: none; padding: 0; margin: 0; }
+      .sidebar li { padding: 10px 0; cursor: pointer; color: #333; }
+      .sidebar li:hover { color: rgb(47, 200, 247);}
+
+      .menu-btn {
+        background: white;
+        color: rgb(247, 180, 47);
+        border: none;
+        border-radius: 6px;
+        padding: 6px 10px;
+        font-size: 1.05rem;
+        cursor: pointer;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+        transition: background 0.2s, transform 0.2s;
+        height: calc(var(--header-h) - 16px);
+        display: inline-flex;
+        align-items: center;
+      }
+      .menu-btn:hover { background: #e0e0e0; }
+
+      main {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding-top: calc(var(--header-h) + 16px);
+        padding-bottom: calc(var(--footer-h) + 16px);
+      }
+      .card {
+        background-color: rgba(251, 246, 246, 0.8);
+        padding: 28px;
+        border-radius: 10px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        width: 100%;
+        max-width: 420px;
+      }
+      .card h2 { text-align: center; margin-bottom: 14px; font-size: 1.15rem; }
+
+      .form-group { margin-bottom: 12px; }
+      label { display:block; margin-bottom:6px; color:#333; font-size:0.95rem; }
+      input { width:100%; padding:10px; border:1px solid #ccc; border-radius:6px; font-size:1rem; }
+
+      button[type="button"] {
+        width:100%;
+        background-color:#0056b3;
+        color:white;
+        padding:10px;
+        border:none;
+        border-radius:6px;
+        font-size:1rem;
+        cursor:pointer;
+      }
+      button[type="button"]:hover { background:#013c7c; }
+
+      footer {
+        background-color: rgb(211, 146, 34);
+        color: #333;
+        text-align: center;
+        padding: 10px 16px;
+        font-size: 0.9em;
+        border-top: 1px solid #000000;
+        height: var(--footer-h);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    </style>
+</head>
+<body>
+  <header>
+    <button class="menu-btn" id="menuBtn" aria-label="Toggle menu" aria-expanded="false">☰</button>
+    <h1>Visiting Innsbruck, Austria</h1>
+  </header>
+
+
+  <div class="sidebar" id="sidebar">
+    <h2>Menu</h2>
+    <ul>
+      <li id="help">Help</li>
+    </ul>
+  </div>
+
+  <main>
+    <div class="card">
+      <h2><strong>Sign In</strong></h2>
+      <form>
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input type="text" id="username" placeholder="User's name" required />
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" placeholder="something@some_mail.some_extension" required />
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" placeholder="••••••••••" required />
+        </div>
+<div id="signInError" style="color: red; margin-bottom: 10px; min-height: 18px;"> </div>
+        <button id="goButton" type="button">Sign In</button>
+      </form>
+    </div>
+  </main>
+
+  <footer>
+    &copy; 2025 Visiting Innsbruck — All rights reserved.
+  </footer>
+
+  <script>
+    const help= document.getElementById('help');
+    const sidebar = document.getElementById('sidebar');
+    const menuBtn = document.getElementById('menuBtn');
+    const goButton = document.getElementById('goButton');
+    const signInError = document.getElementById('signInError');
+
+    help.addEventListener('click', () => {
+      alert('For assistance, please contact the creator of this site 😅');
+      });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Enter') goButton.click(); });
+
+
+  function updateMenuButton() {
+      if (sidebar.classList.contains('open')) {
+        menuBtn.setAttribute('aria-expanded', 'true');
+      } else {
+        menuBtn.setAttribute('aria-expanded', 'false');
+      }
+    }
+
+    menuBtn.addEventListener('click', () => {
+      sidebar.classList.toggle('open');
+      updateMenuButton();
+    });
+  goButton.addEventListener('click', function() {
+      const username = document.getElementById('username').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value.trim();
+      const errorMsg = document.getElementById('signInError');
+
+      if (username === '' || password === '' || email === '') {
+        errorMsg.textContent = '⚠️ Please fill in all fields.';
+      } else {
+        errorMsg.textContent = ' ';
+        const userData = { username, email, password };
+        localStorage.setItem('userData', JSON.stringify(userData));
+        window.location.href = 'Proekt1_23.html';
+      }
+    });
+    window.addEventListener('resize', updateMenuButton);
+    document.addEventListener('DOMContentLoaded', updateMenuButton);
+  </script>
+</body>
+</html>
