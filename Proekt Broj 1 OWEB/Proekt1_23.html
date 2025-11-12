@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Visiting Innsbruck</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --header-h: 56px;
+      --gap: 12px;
+      --accent: #2fbaf7;
+      --bg-light: #f5fafd;
+      --text-dark: #333;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      color: var(--text-dark);
+    }
+
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: var(--header-h);
+      background-color: var(--accent);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      z-index: 120;
+    }
+
+    header h1 {
+      font-style: italic;
+      font-size: 1.2rem;
+      margin: 0;
+      letter-spacing: .3px;
+    }
+
+    .menu-btn {
+      background: white;
+      color: var(--accent);
+      border: none;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 1rem;
+      cursor: pointer;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+    }
+    .menu-btn:hover { background: #f0f0f0; }
+
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: -260px;
+      width: 260px;
+      height: 100%;
+      background-color: white;
+      box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+      transition: left 0.3s ease;
+      padding: calc(var(--header-h) + 16px) 20px 20px;
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .sidebar.open { left: 0; }
+
+    .sidebar h2 {
+      margin: 0 0 12px;
+      font-size: 1.1rem;
+      color: var(--accent);
+    }
+
+    .sidebar ul { list-style: none; padding: 0; margin: 0; flex-grow: 1; }
+    .sidebar li {
+      padding: 10px 0;
+      cursor: pointer;
+      color: var(--text-dark);
+      font-weight: 600;
+      border-bottom: 1px dashed #eee;
+    }
+    .sidebar li:hover { color: var(--accent); }
+
+    .username-display {
+      padding: 10px;
+      border-top: 1px solid #ccc;
+      font-weight: bold;
+      text-align: center;
+      color: #555;
+      background-color: #f7f7f7;
+      border-radius: 8px;
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: calc(var(--header-h) + 20px);
+      text-align: center;
+    }
+
+    section {
+      width: min(92%, 980px);
+      margin: 40px 0;
+      background: white;
+      border-radius: 16px;
+      padding: 22px;
+      box-shadow: 0 10px 30px rgba(2,12,27,.08);
+    }
+
+    section h2 { color: var(--accent); margin: 0 0 14px; }
+
+    .gallery-container { position: relative; max-width: 900px; margin: 0 auto; }
+    .gallery-img {
+      width: 100%;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0,0,0,.25);
+      transition: opacity .5s ease-in-out, transform .4s ease;
+      object-fit: cover;
+      aspect-ratio: 16/9;
+    }
+
+    .guide-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 18px;
+    }
+
+    .guide {
+      background-color: rgba(0,0,0,.65);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 8px 22px rgba(0,0,0,.28);
+      text-align: left;
+    }
+
+    .guide-photo {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+      display: block;
+      filter: saturate(1.05);
+    }
+
+    .guide-content { padding: 16px 16px 12px; }
+    .guide h3 { color: rgb(47,200,247); margin: 0 0 8px; font-size: 1.05rem; }
+    .guide p { color: #f2fbff; line-height: 1.6; margin: 0 0 10px; }
+
+    .like-dislike {
+      display: flex; align-items: center; gap: 10px; margin-top: 8px;
+    }
+
+    .likeBtn, .dislikeBtn {
+      background-color: white;
+      color: rgb(47,200,247);
+      border: none;
+      border-radius: 8px;
+      padding: 8px 14px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform .15s ease, background .2s;
+    }
+    .likeBtn:hover { background-color: rgb(47,200,247); color: white; }
+    .dislikeBtn:hover { background-color: rgb(240,80,80); color: white; }
+    .pulse { animation: pulseBtn .25s ease-in-out; }
+    @keyframes pulseBtn { 0%{transform:scale(1)} 50%{transform:scale(1.1)} 100%{transform:scale(1)} }
+
+    .floating-number {
+      position: fixed;
+      font-weight: 800;
+      color: rgb(47,200,247);
+      animation: floatUp 1s ease-out forwards;
+      pointer-events: none;
+      font-size: 1rem;
+      z-index: 1000;
+    }
+    @keyframes floatUp { 0%{opacity:1; transform: translateY(0)} 100%{opacity:0; transform: translateY(-28px)} }
+
+    #reviewList div {
+      background: #f1f8ff;
+      border-left: 4px solid var(--accent);
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin: 8px 0;
+      text-align: left;
+    }
+
+    button {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 16px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background .2s, transform .15s ease;
+    }
+    button:hover { background: #1f90c8; }
+    button:active { transform: translateY(1px); }
+
+    footer { color: #255; opacity: .9; margin: 10px 0 30px; font-size: .9rem; }
+  </style>
+</head>
+
+<body>
+  <header>
+    <button class="menu-btn" id="menuBtn" aria-label="Toggle menu" aria-controls="sidebar" aria-expanded="false">☰</button>
+    <h1>Visiting Innsbruck, Austria</h1>
+  </header>
+
+  <nav class="sidebar" id="sidebar" aria-label="Site">
+    <div>
+      <h2>Menu</h2>
+      <ul>
+        <li data-target="#home">Home</li>
+        <li data-target="#guide">Guide</li>
+        <li data-target="#reviews">Reviews</li>
+        <li data-target="#help">Help</li>
+        <li id="logoutBtn" style="color:#d32f2f; font-weight:700">Logout</li>
+      </ul>
+    </div>
+    <div class="username-display" id="usernameDisplay">Welcome, Guest</div>
+  </nav>
+
+  <main>
+    <!-- HOME -->
+    <section id="home">
+      <h1>Welcome to the City Explorer Page</h1>
+      <h2>Discover the beauty of Innsbruck — the heart of the Alps. Explore local attractions, enjoy authentic Austrian food, and share your experience with fellow travelers through our reviews section below.</h2>
+    </section>
+
+    <!-- GALLERY -->
+    <section id="gallery" style="text-align:center; color: #113;">
+      <h2>Innsbruck Highlights</h2>
+      <div class="gallery-container">
+        <img id="galleryImage" src="slideshow1.jpg" alt="Innsbruck highlights" class="gallery-img" />
+      </div>
+    </section>
+
+    <!-- GUIDE (with images above each card) -->
+    <section id="guide" aria-labelledby="guide-title">
+      <h2 id="guide-title">6 Must See Places</h2>
+      <div class="guide-grid" id="galleryGuides">
+
+        <article class="guide" data-index="0">
+          <img class="guide-photo" src="slideshow2.jpg" alt="The Riverside (Along the River Inn), Innsbruck" loading="lazy" />
+          <div class="guide-content">
+            <h3>The Riverside</h3>
+            <p>Strolling along the Inn River offers a peaceful escape with postcard-perfect views of colorful houses and alpine backdrops. The promenade is ideal for walking, cycling, or simply sitting on a bench to soak in the scenery. In warmer months, locals gather here for picnics or paddleboarding. The riverbanks are dotted with cafes and green spaces, making it a great spot to relax after sightseeing. Don’t miss the view from the Marktplatz bridge, especially at sunset when the mountains glow. It’s also a great vantage point for photos of the Old Town skyline. Whether you’re up for a jog or a quiet moment, the riverside is a must.</p>
+            <div class="like-dislike">
+              <button class="likeBtn" data-index="0" aria-label="Like Riverside">👍 Like (<span id="likeCount0"></span>)</button>
+              <button class="dislikeBtn" data-index="0" aria-label="Dislike Riverside">👎 Dislike (<span id="dislikeCount0"></span>)</button>
+            </div>
+          </div>
+        </article>
+
+        <article class="guide" data-index="1">
+          <img class="guide-photo" src="slideshow5.jpg" alt="Nordkette mountain range" loading="lazy" />
+          <div class="guide-content">
+            <h3>Nordkette Mountain Range</h3>
+            <p>The Nordkette is Innsbruck’s crown jewel, rising dramatically from the city and accessible via cable car in minutes. Start your ascent from the Hungerburg funicular, then transfer to the Nordkette cable car for jaw-dropping views. At Hafelekar Peak (2,300 meters), you’ll feel like you’re on top of the world. In summer, it’s a paradise for hikers and climbers; in winter, it transforms into a snowy playground. The views over the city and deep into the Karwendel Alps are unforgettable. There’s even a stylish alpine restaurant at Seegrube for lunch with a view. It’s nature and adventure, right at Innsbruck’s doorstep.</p>
+            <div class="like-dislike">
+              <button class="likeBtn" data-index="1" aria-label="Like Nordkette">👍 Like (<span id="likeCount1"></span>)</button>
+              <button class="dislikeBtn" data-index="1" aria-label="Dislike Nordkette">👎 Dislike (<span id="dislikeCount1"></span>)</button>
+            </div>
+          </div>
+        </article>
+
+        <article class="guide" data-index="2">
+          <img class="guide-photo" src="gallery4.jpg" alt="Innsbruck Old Town" loading="lazy" />
+          <div class="guide-content">
+            <h3>The Old Town</h3>
+            <p>Innsbruck’s Old Town is a compact treasure trove of medieval charm and imperial grandeur. Cobblestone streets wind past pastel facades, arcaded shops, and centuries-old buildings. Highlights include the Imperial Palace, the City Tower, and the ornate Court Church. Maria-Theresien-Strasse is perfect for shopping and people-watching. The area is pedestrian-friendly, making it easy to explore on foot. Street performers and outdoor cafes add to the lively atmosphere. It’s the heart of Innsbruck’s history and culture.</p>
+            <div class="like-dislike">
+              <button class="likeBtn" data-index="2" aria-label="Like Old Town">👍 Like (<span id="likeCount2"></span>)</button>
+              <button class="dislikeBtn" data-index="2" aria-label="Dislike Old Town">👎 Dislike (<span id="dislikeCount2"></span>)</button>
+            </div>
+          </div>
+        </article>
+
+        <article class="guide" data-index="3">
+          <img class="guide-photo" src="gallery1.jpg" alt="Ambras Castle with gardens" loading="lazy" />
+          <div class="guide-content">
+            <h3>Ambras Castle</h3>
+            <p>Ambras Castle sits on a hill overlooking Innsbruck and is a masterpiece of Renaissance architecture. Once home to Archduke Ferdinand II, it now houses a fascinating museum of art, armor, and curiosities. The Spanish Hall is a highlight, with its stunning woodwork and portraits of Tyrolean nobles. The castle gardens are peaceful and beautifully landscaped, perfect for a quiet stroll. You’ll also find rare artifacts like glassware, weaponry, and exotic items collected from around the world. It’s a blend of history, art, and nature. A short tram ride from the city center makes it easily accessible.</p>
+            <div class="like-dislike">
+              <button class="likeBtn" data-index="3" aria-label="Like Ambras Castle">👍 Like (<span id="likeCount3"></span>)</button>
+              <button class="dislikeBtn" data-index="3" aria-label="Dislike Ambras Castle">👎 Dislike (<span id="dislikeCount3"></span>)</button>
+            </div>
+          </div>
+        </article>
+
+        <article class="guide" data-index="4">
+          <img class="guide-photo" src="gallery2.jpg" alt="Swarovski Crystal Worlds Garden" loading="lazy" />
+          <div class="guide-content">
+            <h3>Swarovski Garden</h3>
+            <p>Located in nearby Wattens, the Swarovski Garden is part of the dazzling Crystal Worlds experience. The garden is a surreal blend of art, nature, and sparkle—featuring installations like the Crystal Cloud floating above a reflective pool. Wander through themed areas designed by international artists, each offering a unique sensory experience. The Giant’s head at the entrance is iconic and sets the tone for the magic inside. It’s a great destination for families, with a playground and interactive exhibits. The garden changes with the seasons, offering fresh beauty year-round. Don’t forget to visit the boutique for exclusive crystal creations.</p>
+            <div class="like-dislike">
+              <button class="likeBtn" data-index="4" aria-label="Like Swarovski">👍 Like (<span id="likeCount4"></span>)</button>
+              <button class="dislikeBtn" data-index="4" aria-label="Dislike Swarovski">👎 Dislike (<span id="dislikeCount4"></span>)</button>
+            </div>
+          </div>
+        </article>
+
+         <article class="guide" data-index="3">
+          <img class="guide-photo" src="slideshow1.jpg" alt="Golden Roof" loading="lazy" />
+          <div class="guide-content">
+            <h3>Golden Roof (Goldenes Dachl)</h3>
+            <p>The Golden Roof is Innsbruck’s most famous landmark, gleaming with 2,657 fire-gilded copper tiles. Built in the 15th century for Emperor Maximilian I, it served as a royal viewing box for festivals and tournaments. Today, it houses a museum that tells the story of the emperor and the city’s medieval past. The building’s ornate reliefs depict scenes of court life and heraldry. It’s located in the heart of the Old Town, surrounded by lively squares and cafes. Snap a photo from below, then head inside for a deeper look. It’s a symbol of Innsbruck’s imperial legacy.</p>
+            <div class="like-dislike">
+              <button class="likeBtn" data-index="5" aria-label="Like Roof">👍 Like (<span id="likeCount5"></span>)</button>
+              <button class="dislikeBtn" data-index="5" aria-label="Dislike Roof">👎 Dislike (<span id="dislikeCount5"></span>)</button>
+            </div>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- REVIEWS -->
+    <section id="reviews">
+      <h2>Traveler Reviews</h2>
+      <p>Been to Innsbruck? Share your thoughts!</p>
+      <div id="reviewList" aria-live="polite"></div>
+      <div style="margin-top:12px">
+        <button id="leaveReviewBtn" aria-label="Leave a review">✍️ Leave a review</button>
+      </div>
+    </section>
+
+    <!-- HELP -->
+    <section id="help">
+      <h2>Help</h2>
+      <p>If you need help, contact the creator of this site. 😊</p>
+    </section>
+
+    <footer>
+            &copy; 2025 Visiting Innsbruck — All rights reserved.
+</footer>
+  </main>
+
+  <script>
+    // =============== SIDEBAR & HEADER ===============
+    const sidebar = document.getElementById('sidebar');
+    const menuBtn = document.getElementById('menuBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const usernameDisplay = document.getElementById('usernameDisplay');
+
+    function updateMenuButton() {
+      menuBtn.setAttribute('aria-expanded', String(sidebar.classList.contains('open')));
+    }
+
+    menuBtn.addEventListener('click', () => {
+      sidebar.classList.toggle('open');
+      updateMenuButton();
+    });
+
+    // Close sidebar when clicking a link
+    document.querySelectorAll('.sidebar li[data-target]').forEach((li) => {
+      li.addEventListener('click', () => {
+        const target = li.getAttribute('data-target');
+        sidebar.classList.remove('open');
+        updateMenuButton();
+        if (target) {
+          const el = document.querySelector(target);
+          if (el) el.scrollIntoView({ behavior: 'smooth' });
+        }
+      });
+    });
+
+    // Username (from localStorage)
+    const userData = JSON.parse(localStorage.getItem('userData')) || null;
+    if (userData && userData.username) {
+      usernameDisplay.textContent = 'Logged in as: ' + userData.username;
+    }
+
+    // Logout
+    logoutBtn.addEventListener('click', () => {
+      localStorage.removeItem('userData');
+      window.location.href = 'Proekt1_2.html';
+    });
+
+    // =============== GALLERY SLIDESHOW ===============
+    const galleryImages = [
+        'slideshow1.jpg',
+        'slideshow2.jpg',
+        'slideshow3.jpg',
+        'slideshow4.jpg',
+        'slideshow5.jpg'
+    ];
+
+    let currentImage = 0;
+    const galleryImg = document.getElementById('galleryImage');
+
+    function showImage(index) {
+      galleryImg.style.opacity = 0;
+      setTimeout(() => {
+        galleryImg.src = galleryImages[index];
+        galleryImg.alt = 'Innsbruck highlight ' + (index + 1);
+        galleryImg.style.opacity = 1;
+      }, 300);
+    }
+
+    showImage(currentImage);
+    setInterval(() => {
+      currentImage = (currentImage + 1) % galleryImages.length;
+      showImage(currentImage);
+    }, 4000);
+
+    // =============== REVIEWS ===============
+    const reviewList = document.getElementById('reviewList');
+    const leaveReviewBtn = document.getElementById('leaveReviewBtn');
+
+    let reviews = JSON.parse(localStorage.getItem('reviews')) || [
+      { name: 'Anna', text: 'Went in January and it was like Frozen!' },
+      { name: 'Teo', text: 'Website is so helpful, the guy who made it is probably very smart!' },
+      { name: 'Luka', text: 'Why is the creator leaving reviews???' }
+    ];
+
+    function displayReviews() {
+      reviewList.innerHTML = '';
+      reviews.forEach((r) => {
+        const div = document.createElement('div');
+        div.textContent = `${r.name}: ${r.text}`;
+        reviewList.appendChild(div);
+      });
+    }
+    displayReviews();
+
+    leaveReviewBtn.addEventListener('click', () => {
+      const name = userData?.username || 'Guest';
+      const text = prompt('Leave your review:');
+      if (text) {
+        reviews.push({ name, text });
+        localStorage.setItem('reviews', JSON.stringify(reviews));
+        displayReviews();
+        alert('Thank you for your review!');
+      }
+    });
+
+    // =============== LIKE / DISLIKE ===============
+    const likeButtons = document.querySelectorAll('.likeBtn');
+    const dislikeButtons = document.querySelectorAll('.dislikeBtn');
+
+    likeButtons.forEach((btn) => {
+      const index = btn.getAttribute('data-index');
+      let likeCount = parseInt(localStorage.getItem(`likeCount${index}`));
+      let dislikeCount = parseInt(localStorage.getItem(`dislikeCount${index}`));
+
+      if (isNaN(likeCount)) {
+        likeCount = Math.floor(Math.random() * 100) + 30;
+        localStorage.setItem(`likeCount${index}`, likeCount);
+      }
+      if (isNaN(dislikeCount)) {
+        dislikeCount = Math.floor(Math.random() * 40) + 10;
+        localStorage.setItem(`dislikeCount${index}`, dislikeCount);
+      }
+
+      const likeDisplay = document.getElementById(`likeCount${index}`);
+      const dislikeDisplay = document.getElementById(`dislikeCount${index}`);
+      likeDisplay.textContent = likeCount;
+      dislikeDisplay.textContent = dislikeCount;
+
+      btn.addEventListener('click', (e) => {
+        likeCount++;
+        localStorage.setItem(`likeCount${index}`, likeCount);
+        likeDisplay.textContent = likeCount;
+
+        btn.classList.add('pulse');
+        setTimeout(() => btn.classList.remove('pulse'), 250);
+
+        const rect = btn.getBoundingClientRect();
+        const floating = document.createElement('span');
+        floating.textContent = '+1';
+        floating.className = 'floating-number';
+        floating.style.left = rect.left + rect.width / 2 - 6 + 'px';
+        floating.style.top = rect.top - 18 + 'px';
+        document.body.appendChild(floating);
+        setTimeout(() => floating.remove(), 1000);
+      });
+    });
+
+    dislikeButtons.forEach((btn) => {
+      const index = btn.getAttribute('data-index');
+      const dislikeDisplay = document.getElementById(`dislikeCount${index}`);
+
+      btn.addEventListener('click', (e) => {
+        let dislikeCount = parseInt(localStorage.getItem(`dislikeCount${index}`)) || 0;
+        dislikeCount++;
+        localStorage.setItem(`dislikeCount${index}`, dislikeCount);
+        dislikeDisplay.textContent = dislikeCount;
+
+        btn.classList.add('pulse');
+        setTimeout(() => btn.classList.remove('pulse'), 250);
+
+        const rect = btn.getBoundingClientRect();
+        const floating = document.createElement('span');
+        floating.textContent = '+1';
+        floating.className = 'floating-number';
+        floating.style.left = rect.left + rect.width / 2 - 6 + 'px';
+        floating.style.top = rect.top - 18 + 'px';
+        document.body.appendChild(floating);
+        setTimeout(() => floating.remove(), 1000);
+      });
+    });
+  </script>
+</body>
+</html>
