@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script>
+      $(document).ready(function () {
+        $("#nameInput, #lnameInput, #emailInput").on("keyup", function () {
+          var valueName = $("#nameInput").val().toLowerCase();
+          var valueLname = $("#lnameInput").val().toLowerCase();
+          var valueEmail = $("#emailInput").val().toLowerCase();
+
+          $("#myTable tr").filter(function () {
+            var textName = $(this).find("td:eq(0)").text().toLowerCase();
+            var textLname = $(this).find("td:eq(1)").text().toLowerCase();
+            var textEmail = $(this).find("td:eq(2)").text().toLowerCase();
+
+            var isMatch =
+              textName.indexOf(valueName) > -1 &&
+              textLname.indexOf(valueLname) > -1 &&
+              textEmail.indexOf(valueEmail) > -1;
+
+            $(this).toggle(isMatch);
+          });
+        });
+      });
+    </script>
+    <style>
+      table {
+        font-family: arial, sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+      }
+
+      td,
+      th {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+      }
+
+      tr:nth-child(even) {
+        background-color: #dddddd;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Filterable Table</h2>
+    <p>
+      Type something in the input field to search the table for first names,
+      last names or emails:
+    </p>
+    <input id="nameInput" type="text" placeholder="Search Firstname.." />
+    <br /><br />
+    <input id="lnameInput" type="text" placeholder="Search Lastname.." />
+    <br /><br />
+    <input id="emailInput" type="text" placeholder="Search Email.." />
+    <br /><br />
+
+    <table>
+      <thead>
+        <tr>
+          <th>Firstname</th>
+          <th>Lastname</th>
+          <th>Email</th>
+        </tr>
+      </thead>
+      <tbody id="myTable">
+        <tr>
+          <td>John</td>
+          <td>Doe</td>
+          <td>john@example.com</td>
+        </tr>
+        <tr>
+          <td>Mary</td>
+          <td>Moe</td>
+          <td>mary@mail.com</td>
+        </tr>
+        <tr>
+          <td>July</td>
+          <td>Dooley</td>
+          <td>july@greatstuff.com</td>
+        </tr>
+        <tr>
+          <td>Anja</td>
+          <td>Ravendale</td>
+          <td>a_r@test.com</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>
+      Note that we start the search in tbody, to prevent filtering the table
+      headers.
+    </p>
+
+    <button id="clear">Clear</button>
+
+    <script>
+      $("#clear").click(function () {
+        $("#nameInput, #lnameInput, #emailInput").val("");
+        $("#myTable tr").show();
+      });
+    </script>
+  </body>
+</html>
